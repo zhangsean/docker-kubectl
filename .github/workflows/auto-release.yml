@@ -27,15 +27,16 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@master
+
+      - name: Check k8s release
+        env:
+          DEBIAN_FRONTEND: noninteractive
         run: |
           git fetch --tags
           export CURRENT=$(git tag | tail -n 1)
           echo "CURRENT=$CURRENT"
           export LATEST=$(curl -sSL https://dl.k8s.io/release/stable.txt)
           echo "LATEST=$LATEST"
-          if [ "$CURRENT" == "" ]; then
-            exit 1;
-          fi
           if [ "$LATEST" != "$CURRENT" ]; then
             echo "New k8s release: $LATEST"
             echo "::set-env name=LATEST::$LATEST"
@@ -50,9 +51,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
+          tag_name: ${{ env.LATEST }}
           release_name: ${{ env.LATEST }}
           body: |
-            Bump to ${{ env.LATEST }}
+            Bump to kubectl ${{ env.LATEST }}
           draft: false
           prerelease: false
