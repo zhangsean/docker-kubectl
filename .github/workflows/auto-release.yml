@@ -13,9 +13,11 @@ on:
   watch:
     types: [started]
     if: github.event.repository.owner.id == github.event.sender.id
+  push:
+    paths:
+      - '.github/workflows/*.yml'
 
 env:
-  LATEST: $(curl -sSL https://dl.k8s.io/release/stable.txt)
   TZ: Asia/Shanghai
 
 jobs:
@@ -30,19 +32,24 @@ jobs:
         env:
           DEBIAN_FRONTEND: noninteractive
         run: |
-          export CURRENT=`git tag | tail -n 1`
-          echo "CURRENT=$CURRENT"
+          export LATEST=$(curl -sSL https://dl.k8s.io/release/stable.txt)
+          export CURRENT=$(git tag | tail -n 1)
           echo "LATEST=$LATEST"
-          if [ $LATEST != $CURRENT ]; then
+          echo "CURRENT=$CURRENT"
+          if [ "$CURRENT" == "" ]; then
+            exit 1;
+          fi
+          if [ "$LATEST" != "$CURRENT" ]; then
             echo "New k8s release: $LATEST"
+            echo "::set-env name=LATEST::$LATEST"
           else
             echo "No new k8s release"
-            exit 1;
+            echo "::set-env name=LATEST::"
           fi
 
       - name: Create Release
         uses: actions/create-release@v1
-        if: success()
+        if: success() && env.LATEST != ''
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
