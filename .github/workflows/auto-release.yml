@@ -27,10 +27,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@master
-
-      - name: Check k8s release
-        env:
-          DEBIAN_FRONTEND: noninteractive
         run: |
           git fetch --tags
           export CURRENT=$(git tag | tail -n 1)
