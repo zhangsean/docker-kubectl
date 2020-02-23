@@ -33,6 +33,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           export LATEST=$(curl -sSL https://dl.k8s.io/release/stable.txt)
+          git tag | tail -n 1
           export CURRENT=$(git tag | tail -n 1)
           echo "LATEST=$LATEST"
           echo "CURRENT=$CURRENT"
