@@ -1,0 +1,54 @@
+#=================================================
+# https://github.com/zhangsean/docker-kubectl
+# Description: Auto check latest kubectl and release zhangsean/kubectl using GitHub Actions
+# License: Apache V2.0
+# Author: ZhangSean
+#=================================================
+
+name: Auto release kubectl
+
+on:
+  schedule:
+    - cron: 0 23 * * *
+  watch:
+    types: [started]
+    if: github.event.repository.owner.id == github.event.sender.id
+
+env:
+  LATEST: $(curl -sSL https://dl.k8s.io/release/stable.txt)
+  TZ: Asia/Shanghai
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@master
+
+      - name: Check k8s release
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          export CURRENT=`git tag | tail -n 1`
+          echo "CURRENT=$CURRENT"
+          echo "LATEST=$LATEST"
+          if [ $LATEST != $CURRENT ]; then
+            echo "New k8s release: $LATEST"
+          else
+            echo "No new k8s release"
+            exit 1;
+          fi
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        if: success()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ env.LATEST }}
+          body: |
+            Bump to ${{ env.LATEST }}
+          draft: false
+          prerelease: false
