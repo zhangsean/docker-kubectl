@@ -34,6 +34,8 @@ jobs:
         run: |
           export LATEST=$(curl -sSL https://dl.k8s.io/release/stable.txt)
           git --version
+          git fetch --tags
+          git tag
           git
           export CURRENT=$(git tag | tail -n 1)
           echo "LATEST=$LATEST"
