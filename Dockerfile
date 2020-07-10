@@ -3,7 +3,8 @@ LABEL MAINTAINER="SeanZhang <zxf2342@qq.com>"
 
 COPY kubeconfig /usr/local/bin/
 
+ENV K8S_RELEASE=v1.18.5
+
 RUN apk --no-cache add jq gettext curl; \
-    RELEASE="$(curl -sSL https://dl.k8s.io/release/stable.txt)"; \
-    curl -LSo /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/${RELEASE}/bin/linux/amd64/kubectl; \
+    curl -LSo /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/${K8S_RELEASE}/bin/linux/amd64/kubectl; \
     chmod +x /usr/local/bin/kubectl

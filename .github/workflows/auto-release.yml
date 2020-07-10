@@ -39,11 +39,26 @@ jobs:
           echo "LATEST=$LATEST"
           if [ "$LATEST" != "$CURRENT" ]; then
             echo "New k8s release: $LATEST"
+            echo "::set-env name=CURRENT::$CURRENT"
             echo "::set-env name=LATEST::$LATEST"
           else
             echo "No new k8s release"
             echo "::set-env name=LATEST::"
           fi
+
+      - name: Bump to new kubectl version
+        if: success() && env.CURRENT != '' && env.LATEST != ''
+        env:
+          DEBIAN_FRONTEND: noninteractive
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Changing version from $CURRENT to $LATEST"
+          sed -i "/K8S_RELEASE/s/$CURRENT/$LATEST/g" Dockerfile
+          # commit and push
+          git config user.email zxf2342@qq.com
+          git config user.name zhangsean
+          git commit -a -m "Bump to kubectl $LATEST"
+          git push
 
       - name: Create Release
         uses: actions/create-release@v1
