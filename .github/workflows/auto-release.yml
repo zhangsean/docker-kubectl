@@ -39,11 +39,11 @@ jobs:
           echo "LATEST=$LATEST"
           if [ "$LATEST" != "$CURRENT" ]; then
             echo "New k8s release: $LATEST"
-            echo "::set-env name=CURRENT::$CURRENT"
-            echo "::set-env name=LATEST::$LATEST"
+            echo "CURRENT=$CURRENT" >> $GITHUB_ENV
+            echo "LATEST=$LATEST" >> $GITHUB_ENV
           else
             echo "No new k8s release"
-            echo "::set-env name=LATEST::"
+            echo "LATEST=" >> $GITHUB_ENV
           fi
 
       - name: Bump to new kubectl version
