@@ -3,7 +3,7 @@ LABEL MAINTAINER="SeanZhang <zxf2342@qq.com>"
 
 COPY kubeconfig /usr/local/bin/
 
-ENV K8S_RELEASE=v1.29.2
+ENV K8S_RELEASE=v1.29.3
 
 RUN apk --no-cache add jq gettext curl; \
     curl -LSo /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/${K8S_RELEASE}/bin/linux/amd64/kubectl; \
